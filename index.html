@@ -3,82 +3,92 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Deutsche Curse - Test</title>
+  <title>Articolo corretto?</title>
   <style>
     body {
       font-family: sans-serif;
       padding: 2rem;
-      max-width: 500px;
+      max-width: 600px;
       margin: auto;
     }
     h1 {
       text-align: center;
     }
-    .question {
-      margin: 2rem 0;
+    .word {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      text-align: center;
     }
-    button {
-      display: block;
+    .options button {
       width: 100%;
-      margin: 0.5rem 0;
       padding: 1rem;
-      font-size: 1rem;
+      margin: 0.5rem 0;
+      font-size: 1.2rem;
     }
     .result {
       margin-top: 1rem;
       font-weight: bold;
+      text-align: center;
+    }
+    #nextBtn {
+      display: none;
+      margin-top: 1rem;
     }
   </style>
 </head>
 <body>
-  <h1>Deutsche Curse</h1>
-  <div class="question">
-    <p id="phrase">Caricamento...</p>
-    <div id="options"></div>
+  <h1>Qual è l'articolo corretto?</h1>
+  <div class="quiz">
+    <div class="word" id="word">Caricamento...</div>
+    <div class="options" id="options"></div>
     <div class="result" id="result"></div>
-    <button id="nextBtn" style="display:none;">Prossima frase</button>
+    <button id="nextBtn">Prossima parola</button>
   </div>
 
   <script>
-    const exercises = [
-      {
-        italian: "Buongiorno",
-        options: ["Guten Abend", "Guten Morgen", "Gute Nacht"],
-        correct: "Guten Morgen"
-      },
-      {
-        italian: "Come stai?",
-        options: ["Ich bin müde", "Wie geht's?", "Was machst du?"],
-        correct: "Wie geht's?"
-      },
-      {
-        italian: "Grazie",
-        options: ["Danke", "Bitte", "Entschuldigung"],
-        correct: "Danke"
-      }
-    ];
-
+    const csvUrl = "https://docs.google.com/uc?export=download&id=1bneZOyyFBcfpaUUj01OPXlsOFmTyCaNm";
+    let data = [];
     let current = 0;
 
-    function loadExercise() {
-      const ex = exercises[current];
-      document.getElementById("phrase").textContent = `Traduci: "${ex.italian}"`;
+    async function loadCSV() {
+      const res = await fetch(csvUrl);
+      const text = await res.text();
+      const lines = text.trim().split("\n").slice(1); // salta intestazione
+      data = lines.map(line => {
+        const [article, word] = line.split(",");
+        return { article: article.trim(), word: word.trim() };
+      });
+      shuffle(data);
+      loadQuestion();
+    }
+
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+    }
+
+    function loadQuestion() {
+      const item = data[current];
+      document.getElementById("word").textContent = `"${item.word}"`;
+      const options = ["der", "die", "das"];
       const optionsDiv = document.getElementById("options");
       const resultDiv = document.getElementById("result");
       const nextBtn = document.getElementById("nextBtn");
 
+      optionsDiv.innerHTML = "";
       resultDiv.textContent = "";
       nextBtn.style.display = "none";
-      optionsDiv.innerHTML = "";
 
-      ex.options.forEach(opt => {
+      options.forEach(opt => {
         const btn = document.createElement("button");
         btn.textContent = opt;
         btn.onclick = () => {
-          if (opt === ex.correct) {
-            resultDiv.textContent = "✅ Giusto!";
+          if (opt === item.article) {
+            resultDiv.textContent = "✅ Corretto!";
           } else {
-            resultDiv.textContent = `❌ Sbagliato! Era: "${ex.correct}"`;
+            resultDiv.textContent = `❌ Sbagliato! Era "${item.article}"`;
           }
           nextBtn.style.display = "block";
         };
@@ -87,11 +97,12 @@
     }
 
     document.getElementById("nextBtn").onclick = () => {
-      current = (current + 1) % exercises.length;
-      loadExercise();
+      current = (current + 1) % data.length;
+      loadQuestion();
     };
 
-    loadExercise();
+    loadCSV();
   </script>
 </body>
 </html>
+
