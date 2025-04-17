@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Deutsche Curse</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 2rem;
+      max-width: 500px;
+      margin: auto;
+    }
+    h1 {
+      text-align: center;
+    }
+    .question {
+      margin: 2rem 0;
+    }
+    button {
+      display: block;
+      width: 100%;
+      margin: 0.5rem 0;
+      padding: 1rem;
+      font-size: 1rem;
+    }
+    .result {
+      margin-top: 1rem;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Deutsche Curse</h1>
+  <div class="question">
+    <p id="phrase">Caricamento...</p>
+    <div id="options"></div>
+    <div class="result" id="result"></div>
+    <button id="nextBtn" style="display:none;">Prossima frase</button>
+  </div>
+
+  <script>
+    const exercises = [
+      {
+        italian: "Buongiorno",
+        options: ["Guten Abend", "Guten Morgen", "Gute Nacht"],
+        correct: "Guten Morgen"
+      },
+      {
+        italian: "Come stai?",
+        options: ["Ich bin müde", "Wie geht's?", "Was machst du?"],
+        correct: "Wie geht's?"
+      },
+      {
+        italian: "Grazie",
+        options: ["Danke", "Bitte", "Entschuldigung"],
+        correct: "Danke"
+      }
+    ];
+
+    let current = 0;
+
+    function loadExercise() {
+      const ex = exercises[current];
+      document.getElementById("phrase").textContent = `Traduci: "${ex.italian}"`;
+      const optionsDiv = document.getElementById("options");
+      const resultDiv = document.getElementById("result");
+      const nextBtn = document.getElementById("nextBtn");
+
+      resultDiv.textContent = "";
+      nextBtn.style.display = "none";
+      optionsDiv.innerHTML = "";
+
+      ex.options.forEach(opt => {
+        const btn = document.createElement("button");
+        btn.textContent = opt;
+        btn.onclick = () => {
+          if (opt === ex.correct) {
+            resultDiv.textContent = "✅ Giusto!";
+          } else {
+            resultDiv.textContent = `❌ Sbagliato! Era: "${ex.correct}"`;
+          }
+          nextBtn.style.display = "block";
+        };
+        optionsDiv.appendChild(btn);
+      });
+    }
+
+    document.getElementById("nextBtn").onclick = () => {
+      current = (current + 1) % exercises.length;
+      loadExercise();
+    };
+
+    loadExercise();
+  </script>
+</body>
+</html>
