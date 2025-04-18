@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="de">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Articolo corretto?</title>
+  <title>Bestimme den richtigen Artikel</title>
   <style>
     body {
       font-family: sans-serif;
@@ -13,6 +13,16 @@
     }
     h1 {
       text-align: center;
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+    h2 {
+      text-align: center;
+      font-size: 1.2rem;
+      font-weight: normal;
+      margin-top: 0;
+      margin-bottom: 2rem;
+      color: #555;
     }
     .word {
       font-size: 1.5rem;
@@ -32,18 +42,37 @@
     }
     #nextBtn {
       display: none;
-      margin-top: 1rem;
+      margin-top: 1.5rem;
+      width: 100%;
+      padding: 1rem;
+      font-size: 1.3rem;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    #nextBtn:hover {
+      background-color: #0056b3;
+    }
+    footer {
+      text-align: center;
+      margin-top: 4rem;
+      font-size: 0.8rem;
+      color: #888;
     }
   </style>
 </head>
 <body>
-  <h1>Qual è l'articolo corretto?</h1>
+  <h1>Bestimme den richtigen Artikel</h1>
+  <h2>VHS Charlottenburg A1.2</h2>
   <div class="quiz">
-    <div class="word" id="word">Caricamento...</div>
+    <div class="word" id="word">Lade Wörter...</div>
     <div class="options" id="options"></div>
     <div class="result" id="result"></div>
-    <button id="nextBtn">Prossima parola</button>
+    <button id="nextBtn">Nächstes Wort</button>
   </div>
+  <footer>by Marco P</footer>
 
   <script>
     const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTLMG3zUFzaLSA82QS7T4E8IAHiung0H2LYRU8hoi_svBol2OoFWmTFBhGVhCPxK2xGtADv1sM9guDr/pub?output=csv";
@@ -53,7 +82,7 @@
     async function loadCSV() {
       const res = await fetch(csvUrl);
       const text = await res.text();
-      const lines = text.trim().split("\n").slice(1); // salta intestazione
+      const lines = text.trim().split("\n").slice(1); // Kopfzeile überspringen
       data = lines.map(line => {
         const [article, word] = line.split(",");
         return { article: article.trim(), word: word.trim() };
@@ -86,9 +115,9 @@
         btn.textContent = opt;
         btn.onclick = () => {
           if (opt === item.article) {
-            resultDiv.textContent = "✅ Corretto!";
+            resultDiv.textContent = "✅ Richtig!";
           } else {
-            resultDiv.textContent = `❌ Sbagliato! Era "${item.article}"`;
+            resultDiv.textContent = `❌ Falsch! Richtiger Artikel: "${item.article}"`;
           }
           nextBtn.style.display = "block";
         };
@@ -105,4 +134,5 @@
   </script>
 </body>
 </html>
+
 
