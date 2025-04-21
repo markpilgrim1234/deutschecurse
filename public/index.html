@@ -29,11 +29,26 @@
       margin: 0;
       font-size: 3.2rem;
       letter-spacing: 2px;
+      color: #ffffff;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
     }
     .tagline {
-      font-size: 1rem;
-      margin-top: 8px;
-      opacity: 0.9;
+      font-size: 1.2rem;
+      margin-top: 15px;
+      color: #000;
+      text-align: center;
+      opacity: 0;
+      animation: fadeInUp 1s ease-out 0.5s forwards;
+    }
+    @keyframes fadeInUp {
+      0% {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
     #content {
       max-width: 900px;
@@ -76,8 +91,8 @@
     footer {
       text-align: center;
       padding: 20px;
-      background: #000;
-      color: #eee;
+      background: #ffffff;
+      color: #000;
       margin-top: 60px;
       font-size: 0.9rem;
     }
@@ -86,8 +101,9 @@
 <body>
   <header>
     <h1>GTE</h1>
-    <div class="tagline">Grammatica Tedesca Interattiva</div>
   </header>
+
+  <div class="tagline">Grammatica Tedesca Interattiva</div>
 
   <main id="content">Caricamento in corso...</main>
 
