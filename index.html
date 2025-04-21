@@ -1,138 +1,83 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="it">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Bestimme den richtigen Artikel</title>
+  <title>Grammatica Tedesca Interattiva</title>
   <style>
     body {
-      font-family: sans-serif;
-      padding: 2rem;
-      max-width: 600px;
-      margin: auto;
+      font-family: Arial, sans-serif;
+      padding: 20px;
     }
-    h1 {
-      text-align: center;
-      font-size: 2rem;
-      margin-bottom: 0.5rem;
-    }
-    h2 {
-      text-align: center;
-      font-size: 1.2rem;
-      font-weight: normal;
-      margin-top: 0;
-      margin-bottom: 2rem;
-      color: #555;
-    }
-    .word {
-      font-size: 1.5rem;
-      margin-bottom: 1rem;
-      text-align: center;
-    }
-    .options button {
-      width: 100%;
-      padding: 1rem;
-      margin: 0.5rem 0;
-      font-size: 1.2rem;
-    }
-    .result {
-      margin-top: 1rem;
-      font-weight: bold;
-      text-align: center;
-    }
-    #nextBtn {
-      display: none;
-      margin-top: 1.5rem;
-      width: 100%;
-      padding: 1rem;
-      font-size: 1.3rem;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      border-radius: 8px;
+    .accordion {
+      background-color: #f1f1f1;
       cursor: pointer;
+      padding: 12px;
+      margin: 5px 0;
+      border: none;
+      text-align: left;
+      font-size: 16px;
+      width: 100%;
+      transition: background-color 0.3s ease;
     }
-    #nextBtn:hover {
-      background-color: #0056b3;
+    .accordion:hover {
+      background-color: #ddd;
     }
-    footer {
-      text-align: center;
-      margin-top: 4rem;
-      font-size: 0.8rem;
-      color: #888;
+    .panel {
+      padding: 10px;
+      display: none;
+      background-color: #fafafa;
+      border: 1px solid #ddd;
+      margin-bottom: 10px;
     }
   </style>
 </head>
 <body>
-  <h1>Bestimme den richtigen Artikel</h1>
-  <h2>VHS Charlottenburg A1.2</h2>
-  <div class="quiz">
-    <div class="word" id="word">Lade Wörter...</div>
-    <div class="options" id="options"></div>
-    <div class="result" id="result"></div>
-    <button id="nextBtn">Nächstes Wort</button>
-  </div>
-  <footer>by Marco P</footer>
+  <h1>📘 Grammatica Tedesca Interattiva</h1>
+  <div id="content">Caricamento...</div>
 
   <script>
-    const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTLMG3zUFzaLSA82QS7T4E8IAHiung0H2LYRU8hoi_svBol2OoFWmTFBhGVhCPxK2xGtADv1sM9guDr/pub?output=csv";
-    let data = [];
-    let current = 0;
+    async function loadGrammar() {
+      // Sostituisci l'endpoint con quello del tuo server locale o backend reale
+      const response = await fetch("/api/grammar");
+      const data = await response.json();
 
-    async function loadCSV() {
-      const res = await fetch(csvUrl);
-      const text = await res.text();
-      const lines = text.trim().split("\n").slice(1); // Kopfzeile überspringen
-      data = lines.map(line => {
-        const [article, word] = line.split(",");
-        return { article: article.trim(), word: word.trim() };
-      });
-      shuffle(data);
-      loadQuestion();
-    }
+      const grouped = data.reduce((acc, item) => {
+        acc[item.category] = acc[item.category] || [];
+        acc[item.category].push(item);
+        return acc;
+      }, {});
 
-    function shuffle(array) {
-      for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-      }
-    }
+      const container = document.getElementById("content");
+      container.innerHTML = "";
 
-    function loadQuestion() {
-      const item = data[current];
-      document.getElementById("word").textContent = `"${item.word}"`;
-      const options = ["der", "die", "das"];
-      const optionsDiv = document.getElementById("options");
-      const resultDiv = document.getElementById("result");
-      const nextBtn = document.getElementById("nextBtn");
+      Object.entries(grouped).forEach(([category, rules]) => {
+        const section = document.createElement("div");
+        section.innerHTML = `<h2>${category}</h2>`;
 
-      optionsDiv.innerHTML = "";
-      resultDiv.textContent = "";
-      nextBtn.style.display = "none";
+        rules.forEach(rule => {
+          const acc = document.createElement("button");
+          acc.className = "accordion";
+          acc.textContent = rule.title;
 
-      options.forEach(opt => {
-        const btn = document.createElement("button");
-        btn.textContent = opt;
-        btn.onclick = () => {
-          if (opt === item.article) {
-            resultDiv.textContent = "✅ Richtig!";
-          } else {
-            resultDiv.textContent = `❌ Falsch! Richtiger Artikel: "${item.article}"`;
-          }
-          nextBtn.style.display = "block";
-        };
-        optionsDiv.appendChild(btn);
+          const panel = document.createElement("div");
+          panel.className = "panel";
+          panel.innerHTML = `<p>${rule.content}</p>`;
+
+          acc.onclick = () => {
+            panel.style.display = panel.style.display === "block" ? "none" : "block";
+          };
+
+          section.appendChild(acc);
+          section.appendChild(panel);
+        });
+
+        container.appendChild(section);
       });
     }
 
-    document.getElementById("nextBtn").onclick = () => {
-      current = (current + 1) % data.length;
-      loadQuestion();
-    };
-
-    loadCSV();
+    loadGrammar().catch(err => {
+      document.getElementById("content").innerText = "Errore nel caricamento delle regole: " + err;
+    });
   </script>
 </body>
 </html>
-
-
