@@ -2,42 +2,91 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Grammatica Tedesca Interattiva</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f7fa;
+      color: #333;
+    }
+    header {
+      background-color: #004080;
+      color: white;
+      padding: 20px 30px;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    header h1 {
+      margin: 0;
+      font-size: 2rem;
+    }
+    #content {
+      max-width: 900px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+    h2 {
+      margin-top: 40px;
+      border-bottom: 2px solid #004080;
+      padding-bottom: 5px;
+      color: #004080;
     }
     .accordion {
-      background-color: #f1f1f1;
+      background-color: #ffffff;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      margin: 10px 0;
+      padding: 15px;
+      font-size: 1rem;
       cursor: pointer;
-      padding: 12px;
-      margin: 5px 0;
-      border: none;
-      text-align: left;
-      font-size: 16px;
-      width: 100%;
       transition: background-color 0.3s ease;
+      text-align: left;
     }
     .accordion:hover {
-      background-color: #ddd;
+      background-color: #e8f0fe;
     }
     .panel {
-      padding: 10px;
       display: none;
-      background-color: #fafafa;
-      border: 1px solid #ddd;
-      margin-bottom: 10px;
+      padding: 15px;
+      background-color: #ffffff;
+      border: 1px solid #ccc;
+      border-top: none;
+      border-radius: 0 0 5px 5px;
+      margin-bottom: 15px;
+      line-height: 1.6;
+    }
+    .tagline {
+      font-size: 1rem;
+      margin-top: 5px;
+      opacity: 0.8;
+    }
+    footer {
+      text-align: center;
+      padding: 20px;
+      background: #eaeaea;
+      margin-top: 60px;
+      font-size: 0.9rem;
+      color: #666;
     }
   </style>
 </head>
 <body>
-  <h1>📘 Grammatica Tedesca Interattiva</h1>
-  <div id="content">Caricamento...</div>
+  <header>
+    <h1>📘 Grammatica Tedesca Interattiva</h1>
+    <div class="tagline">Impara con chiarezza, memorizza con semplicità.</div>
+  </header>
+
+  <main id="content">Caricamento in corso...</main>
+
+  <footer>
+    © 2025 Grammatica Tedesca | Progetto educativo open source
+  </footer>
 
   <script>
     async function loadGrammar() {
-      // Sostituisci l'endpoint con quello del tuo server locale o backend reale
       const response = await fetch("/api/grammar");
       const data = await response.json();
 
@@ -51,8 +100,10 @@
       container.innerHTML = "";
 
       Object.entries(grouped).forEach(([category, rules]) => {
-        const section = document.createElement("div");
-        section.innerHTML = `<h2>${category}</h2>`;
+        const section = document.createElement("section");
+        const heading = document.createElement("h2");
+        heading.textContent = category;
+        section.appendChild(heading);
 
         rules.forEach(rule => {
           const acc = document.createElement("button");
@@ -61,11 +112,17 @@
 
           const panel = document.createElement("div");
           panel.className = "panel";
-          panel.innerHTML = `<p>${rule.content}</p>`;
+          panel.innerHTML = `<p>${rule.content.replace(/\n/g, '<br>')}</p>`;
 
-          acc.onclick = () => {
-            panel.style.display = panel.style.display === "block" ? "none" : "block";
-          };
+          acc.addEventListener("click", () => {
+            const isVisible = panel.style.display === "block";
+            document.querySelectorAll('.panel').forEach(p => p.style.display = "none");
+            document.querySelectorAll('.accordion').forEach(b => b.classList.remove("active"));
+            if (!isVisible) {
+              panel.style.display = "block";
+              acc.classList.add("active");
+            }
+          });
 
           section.appendChild(acc);
           section.appendChild(panel);
@@ -76,7 +133,7 @@
     }
 
     loadGrammar().catch(err => {
-      document.getElementById("content").innerText = "Errore nel caricamento delle regole: " + err;
+      document.getElementById("content").innerHTML = `<p style="color:red;">Errore nel caricamento delle regole: ${err.message}</p>`;
     });
   </script>
 </body>
